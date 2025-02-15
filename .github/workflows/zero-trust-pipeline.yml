@@ -55,15 +55,18 @@ jobs:
           chmod +x cosign-linux-amd64
           sudo mv cosign-linux-amd64 /usr/local/bin/cosign
 
-      - name: Sign Docker Image with Cosign
+      - name: Decode Cosign Key
+        run: echo "${{ secrets.COSIGN_KEY }}" | base64 --decode > cosign.key
+
+      - name: Sign Image with Cosign
         env:
-          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key env://COSIGN_KEY ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest
+          cosign sign --key cosign.key ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest
 
       - name: Verify Signature
-        env:
-          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
         run: |
-          cosign verify ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest --key env://COSIGN_KEY
+          cosign verify ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest \
+            --certificate-identity "https://github.com/${{ github.repository }}/actions" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
 

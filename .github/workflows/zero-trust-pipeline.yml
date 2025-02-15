@@ -61,6 +61,7 @@ jobs:
       - name: Sign Image with Cosign
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          COSIGN_YES: "true"   # <--- This auto-confirms signing
         run: |
           cosign sign --key cosign.key ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest
 

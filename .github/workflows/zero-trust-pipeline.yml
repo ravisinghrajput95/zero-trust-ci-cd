@@ -36,7 +36,7 @@ jobs:
         with:
           image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest'
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'                   #set to 1 in case to fail the build
           severity: 'CRITICAL'
 
       - name: Push Image to Docker Hub

@@ -73,9 +73,9 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           COSIGN_YES: "true"   # <--- This auto-confirms signing
         run: |
-          cosign sign --key cosign.key $IMAGE_DIGEST
+          cosign sign --key cosign.key ${{ secrets.DOCKERHUB_USERNAME }}/my-image@$IMAGE_DIGEST
 
       - name: Verify Signature
         run: |
-          cosign verify --key cosign.key $IMAGE_DIGEST
+          cosign verify --key cosign.key ${{ secrets.DOCKERHUB_USERNAME }}/my-image@$IMAGE_DIGEST
 

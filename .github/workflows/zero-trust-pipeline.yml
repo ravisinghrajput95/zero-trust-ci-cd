@@ -56,10 +56,14 @@ jobs:
           sudo mv cosign-linux-amd64 /usr/local/bin/cosign
 
       - name: Sign Docker Image with Cosign
+        env:
+          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
         run: |
           cosign sign --key env://COSIGN_KEY ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest
 
       - name: Verify Signature
+        env:
+          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
         run: |
           cosign verify ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest --key env://COSIGN_KEY
 

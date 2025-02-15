@@ -56,8 +56,8 @@ jobs:
       -  name: Get Image Digest
          id: digest
          run: |
-           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest | awk -F '@' '{print $2}')
-           echo "IMAGE_DIGEST=sha256:$DIGEST" >> $GITHUB_ENV
+           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.DOCKER_USERNAME }}/my-image:latest | awk -F '@' '{print $2}')
+           echo "IMAGE_DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Install Cosign
         run: |

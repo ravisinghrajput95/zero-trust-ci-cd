@@ -52,7 +52,7 @@ jobs:
       - name: Get Image Digest
         id: digest
         run: |
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.DOCKER_USERNAME }}/my-image:latest)
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest)
           echo "IMAGE_DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Install Cosign

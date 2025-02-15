@@ -29,19 +29,19 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-image:${{ github.sha }} .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-image@sha256:${{ github.sha }} .
 
       - name: Scan Image with Trivy
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/my-image:${{ github.sha }}'
+          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/my-image@sha256:${{ github.sha }}'
           format: 'table'
           exit-code: '0'                   #set to 1 in case to fail the build
           severity: 'CRITICAL'
 
       - name: Push Image to Docker Hub
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-image:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-image@sha256:${{ github.sha }}
 
   sign:
     name: Sign and Verify Artifacts
@@ -63,7 +63,7 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           COSIGN_YES: "true"   # <--- This auto-confirms signing
         run: |
-          cosign sign --key cosign.key docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-image:${{ github.sha }}
+          cosign sign --key cosign.key docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-image@sha256:${{ github.sha }}
 
       - name: Verify Signature
         run: |

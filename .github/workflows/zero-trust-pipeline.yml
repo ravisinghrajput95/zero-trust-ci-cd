@@ -49,11 +49,15 @@ jobs:
     needs: build
 
     steps:
-      - name: Get Image Digest
-        id: digest
+      - name: Pull Image Before Getting Digest
         run: |
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest)
-          echo "IMAGE_DIGEST=$DIGEST" >> $GITHUB_ENV
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest
+
+      -  name: Get Image Digest
+         id: digest
+         run: |
+           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest | awk -F '@' '{print $2}')
+           echo "IMAGE_DIGEST=sha256:$DIGEST" >> $GITHUB_ENV
 
       - name: Install Cosign
         run: |

@@ -49,6 +49,12 @@ jobs:
     needs: build
 
     steps:
+      - name: Get Image Digest
+        id: digest
+        run: |
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.DOCKER_USERNAME }}/my-image:latest)
+          echo "IMAGE_DIGEST=$DIGEST" >> $GITHUB_ENV
+
       - name: Install Cosign
         run: |
           curl -LO https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
@@ -63,11 +69,9 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           COSIGN_YES: "true"   # <--- This auto-confirms signing
         run: |
-          cosign sign --key cosign.key docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-image:${{ github.sha }}
+          cosign sign --key cosign.key $IMAGE_DIGEST
 
       - name: Verify Signature
         run: |
-          cosign verify ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest \
-            --certificate-identity "https://github.com/${{ github.repository }}/actions" \
-            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+          cosign verify --key cosign.key $IMAGE_DIGEST
 

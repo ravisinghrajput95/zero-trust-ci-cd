@@ -1,7 +1,7 @@
 package docker.security
 
 # Define approved base images
-approved_base_images = {"python:3.11-slim", "alpine:latest", "ubuntu:20.04"}
+approved_base_images := {"python:3.11-slim", "alpine:latest", "ubuntu:20.04"}
 
 # Rule to prevent running as root
 deny[msg] {
@@ -11,7 +11,7 @@ deny[msg] {
 
 # Rule to enforce approved base images
 deny[msg] {
-    not approved_base_images[input.config.BaseImage]
+    not input.config.BaseImage in approved_base_images
     msg := sprintf("Unapproved base image used: %s", [input.config.BaseImage])
 }
 

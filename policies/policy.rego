@@ -1,7 +1,11 @@
-package policies
+package docker.security
 
-# Define approved base images (set)
-approved_base_images = { "python:3.11-slim" }
+# Main deny rule for unauthorized base images
+deny[msg] {
+    input.config.BaseImage
+    not contains(approved_base_images, input.config.BaseImage)
+    message = sprintf("Base image '%s' is not approved", [input.config.BaseImage])
+}
 
 # Rule to prevent running as root
 deny[msg] {

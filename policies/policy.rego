@@ -1,42 +1,48 @@
 package docker.security
 
-# Approved base images
+# Define a set of approved base images
 approved_base_images = {"python:3.11-slim", "debian:stable-slim"}
 
-# Rule for security violations
-deny_violation[msg] {
-        input.config.User == "root"
-        msg := "Containers must not run as root user"
+# Define a set of dangerous capabilities
+dangerous_capabilities = {"SYS_ADMIN", "NET_ADMIN", "DAC_OVERRIDE"}
+
+# Rule to prevent running as root
+deny[msg] {
+    input.config.User == "root"
+    msg := "Containers must not run as root user"
 }
 
-deny_violation[msg] {
-        not approved_base_images[input.config.BaseImage]
-        msg := sprintf("Unapproved base image used: %s", [input.config.BaseImage])
+# Rule to enforce approved base images
+deny[msg] {
+    not approved_base_images[input.config.BaseImage]
+    msg := sprintf("Unapproved base image used: %s", [input.config.BaseImage])
 }
 
-deny_violation[msg] {
-        input.config.HostConfig.Privileged == true
-        msg := "Privileged mode is not allowed"
+# Rule to prevent privileged mode
+deny[msg] {
+    input.config.HostConfig.Privileged == true
+    msg := "Privileged mode is not allowed"
 }
 
-deny_violation[msg] {
-        input.config.HostConfig.ReadonlyRootfs == false
-        msg := "Root filesystem must be read-only"
+# Rule to enforce read-only root filesystem
+deny[msg] {
+    input.config.HostConfig.ReadonlyRootfs == false
+    msg := "Root filesystem must be read-only"
 }
 
-# Ensure security headers exist
-deny_violation[msg] {
-        not input.security_headers["Content-Security-Policy"]
-        msg := "Missing Content-Security-Policy header"
+# Rule to check for security headers
+deny[msg] {
+    not input.security_headers["Content-Security-Policy"]
+    msg := "Missing Content-Security-Policy header"
 }
 
-deny_violation[msg] {
-        not input.security_headers["X-Frame-Options"]
-        msg := "Missing X-Frame-Options header"
+deny[msg] {
+    not input.security_headers["X-Frame-Options"]
+    msg := "Missing X-Frame-Options header"
 }
 
-# Deny if logging is disabled
-deny_violation[msg] {
-        input.config.LogConfig.Type == "none"
-        msg := "Logging must be enabled"
+# Rule to enforce logging
+deny[msg] {
+    input.config.LogConfig.Type == "none"
+    msg := "Logging must be enabled"
 }

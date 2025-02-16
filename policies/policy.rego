@@ -1,4 +1,4 @@
-package docker.security
+package policies
 
 # Define approved base images (set)
 approved_base_images = { "python:3.11-slim" }

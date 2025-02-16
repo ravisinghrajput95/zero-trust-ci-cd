@@ -1,5 +1,8 @@
 package docker.security
 
+# Define approved base images
+approved_base_images = {"python:3.11-slim", "alpine:latest", "ubuntu:20.04"}
+
 # Rule to prevent running as root
 deny[msg] {
     input.config.User == "root"

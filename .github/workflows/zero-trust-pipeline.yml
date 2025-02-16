@@ -59,6 +59,7 @@ jobs:
 
       - name: Sign Image with Cosign
         env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           COSIGN_YES: "true"   # <--- This auto-confirms signing
         run: |

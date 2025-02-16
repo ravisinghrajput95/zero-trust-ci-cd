@@ -66,4 +66,4 @@ jobs:
 
       - name: Verify Signature
         run: |
-          cosign verify --key cosign.key ${{ secrets.DOCKERHUB_USERNAME }}/my-image@$IMAGE_DIGEST
+          cosign verify --key ${{ secrets.COSIGN_PUB }} ${{ secrets.DOCKERHUB_USERNAME }}/my-image@$IMAGE_DIGEST

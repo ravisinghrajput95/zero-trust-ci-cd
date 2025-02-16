@@ -1,0 +1,18 @@
+{
+    "config": {
+      "User": "flaskuser",
+      "BaseImage": "python:3.11-slim",
+      "HostConfig": {
+        "Privileged": false,
+        "ReadonlyRootfs": true,
+        "CapAdd": [],
+        "LogConfig": {
+          "Type": "json-file"
+        }
+      }
+    },
+    "security_headers": {
+      "Content-Security-Policy": "default-src 'self';",
+      "X-Frame-Options": "DENY"
+    }
+  }  

@@ -72,3 +72,17 @@ jobs:
       - name: Verify Signature
         run: |
           cosign verify --key cosign.pub ${{ secrets.DOCKERHUB_USERNAME }}/my-image@$IMAGE_DIGEST
+
+      - name: Install OPA
+        run: |
+          curl -L -o opa https://openpolicyagent.org/downloads/latest/opa_linux_amd64
+          chmod +x opa
+          sudo mv opa /usr/local/bin/
+
+      - name: Verify OPA installation
+        run: opa version
+
+      - name: Run OPA policy check
+        run: |
+          opa eval --input input.json --data policies/policy.rego 'data.docker.security.deny'
+        continue-on-error: false

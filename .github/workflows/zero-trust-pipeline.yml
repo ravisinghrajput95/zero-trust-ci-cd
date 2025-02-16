@@ -41,11 +41,7 @@ jobs:
 
       - name: Retrieve Image Digest
         run: |
-          DIGEST=$(docker inspect --format='{{.RepoDigests}}' ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest
-          if [[ -z "$DIGEST" ]]; then
-            echo "Error: Image digest not found!"
-            exit 1
-          fi
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest | awk -F'@' '{print $2}')
           echo "IMAGE_DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Install Cosign

@@ -79,4 +79,4 @@ jobs:
           version: latest
 
       - name: Run OPA Tests
-        run: opa test tests/*.rego -v
+        run: opa test policies/*.rego 

@@ -6,44 +6,50 @@ approved_base_images = [
 ]
 
 # Main deny rule for unauthorized base images
-allow if {
+deny[msg] {
     input.config.BaseImage
-    contains(approved_base_images, input.config.BaseImage)
-    msg := sprintf("Base image '%s' is not approved", [input.config.BaseImage])
+    image := input.config.BaseImage
+    not image_in_approved_base_images(image)
+    msg := sprintf("Base image '%s' is not approved", [image])
+}
+
+# Function to check if an image is in the approved list
+image_in_approved_base_images(image) {
+    approved_base_images[_] == image
 }
 
 # Rule to prevent running as root
-allow if {
+deny[msg] {
     input.config.User == "root"
     msg := "Containers must not run as root user"
 }
 
 # Rule to prevent privileged mode
-allow if {
+deny[msg] {
     input.config.HostConfig.Privileged == true
     msg := "Privileged mode is not allowed"
 }
 
 # Rule to enforce read-only root filesystem
-allow if {
+deny[msg] {
     input.config.HostConfig.ReadonlyRootfs == false
     msg := "Root filesystem must be read-only"
 }
 
 # Rule to check for Content-Security-Policy header
-allow if {
+deny[msg] {
     not input.security_headers["Content-Security-Policy"]
     msg := "Missing Content-Security-Policy header"
 }
 
 # Rule to check for X-Frame-Options header
-allow if {
+deny[msg] {
     not input.security_headers["X-Frame-Options"]
     msg := "Missing X-Frame-Options header"
 }
 
 # Rule to enforce logging configuration
-allow if {
+deny[msg] {
     input.config.LogConfig.Type == "none"
     msg := "Logging must be enabled"
 }

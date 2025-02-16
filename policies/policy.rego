@@ -5,17 +5,17 @@ approved_base_images = [
     "python:3.11-slim"
 ]
 
-# Main deny rule for unauthorized base images
+# Function to check if an image is in the approved list
+image_in_approved_base_images(image) {
+    approved_base_images[_] == image
+}
+
+# Rule to prevent unauthorized base images
 deny[msg] {
     input.config.BaseImage
     image := input.config.BaseImage
     not image_in_approved_base_images(image)
     msg := sprintf("Base image '%s' is not approved", [image])
-}
-
-# Function to check if an image is in the approved list
-image_in_approved_base_images(image) {
-    approved_base_images[_] == image
 }
 
 # Rule to prevent running as root
@@ -119,3 +119,5 @@ deny[msg] {
   not input.security_headers["X-Frame-Options"]
   msg := "Missing 'security_headers.X-Frame-Options' in input"
 }
+
+# Add similar checks for ALL other fields you access.  This is CRUCIAL.

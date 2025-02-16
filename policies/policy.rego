@@ -8,7 +8,7 @@ approved_base_images = [
 # Main deny rule for unauthorized base images
 allow if {
     input.config.BaseImage
-    not contains(approved_base_images, input.config.BaseImage)
+    contains(approved_base_images, input.config.BaseImage)
     msg := sprintf("Base image '%s' is not approved", [input.config.BaseImage])
 }
 

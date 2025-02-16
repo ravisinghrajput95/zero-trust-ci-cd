@@ -9,7 +9,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application files
-COPY app.py ./
+COPY src/app.py ./
 
 # Run as a non-root user for security
 RUN useradd -m flaskuser

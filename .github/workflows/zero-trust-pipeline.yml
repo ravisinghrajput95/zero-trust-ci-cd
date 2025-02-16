@@ -66,7 +66,7 @@ jobs:
       
       - name: Setup Cosign Public Key from Secret
         run: |
-          echo "${{ secrets.COSIGN_PUBLIC_KEY }}" > cosign.pub
+          echo "${{ secrets.COSIGN_PUB }}" > cosign.pub
           chmod 600 cosign.pub
 
       - name: Verify Signature

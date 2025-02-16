@@ -1,36 +1,36 @@
 package docker.security
 
-# Enforce only approved base images
+# Approved base images
 approved_base_images := {
     "python:3.11-slim",
     "debian:stable-slim"
 }
 
-# Ensure non-root user is used in the container
+# Deny running as root user
 deny[msg] {
     input.config.User == "root"
     msg := "Containers must not run as root user"
 }
 
-# Ensure the base image is from the approved list
+# Deny unapproved base images
 deny[msg] {
     not input.config.BaseImage in approved_base_images
     msg := sprintf("Unapproved base image used: %s", [input.config.BaseImage])
 }
 
-# Restrict privileged mode
+# Deny privileged mode
 deny[msg] {
     input.config.HostConfig.Privileged == true
     msg := "Privileged mode is not allowed"
 }
 
-# Ensure read-only root filesystem
+# Deny non-read-only root filesystem
 deny[msg] {
     input.config.HostConfig.ReadonlyRootfs == false
     msg := "Root filesystem must be read-only"
 }
 
-# Restrict dangerous capabilities
+# Deny dangerous capabilities
 dangerous_capabilities := {"SYS_ADMIN", "NET_ADMIN", "DAC_OVERRIDE"}
 deny[msg] {
     some cap in input.config.HostConfig.CapAdd
@@ -38,7 +38,7 @@ deny[msg] {
     msg := sprintf("Container should not have dangerous capability: %s", [cap])
 }
 
-# Ensure necessary security headers
+# Ensure security headers exist
 deny[msg] {
     not input.security_headers["Content-Security-Policy"]
     msg := "Missing Content-Security-Policy header"
@@ -49,9 +49,8 @@ deny[msg] {
     msg := "Missing X-Frame-Options header"
 }
 
-# Ensure logging is enabled
+# Deny if logging is disabled
 deny[msg] {
     input.config.LogConfig.Type == "none"
     msg := "Logging must be enabled"
 }
-

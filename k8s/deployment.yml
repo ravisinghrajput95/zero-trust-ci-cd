@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-app
+  name: flask-app
   labels:
-    app: my-app
+    app: flask-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: my-app
+      app: flask-app
   template:
     metadata:
       labels:
-        app: my-app
+        app: flask-app
     spec:
       containers:
-        - name: my-app-container
+        - name: flask-app-container
           image: "${{ secrets.DOCKERHUB_USERNAME }}/my-image:latest"
           imagePullPolicy: Always
           ports:

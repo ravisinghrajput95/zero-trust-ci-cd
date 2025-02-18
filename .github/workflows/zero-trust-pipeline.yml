@@ -81,6 +81,12 @@ jobs:
       - name: Run OPA Tests
         run: opa test policies/*.rego 
 
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v2.0
+        with:
+          version: 'v1.30.0'
+        id: install
+
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -92,14 +98,6 @@ jobs:
 
       - name: Configure EKS Access
         run: aws eks update-kubeconfig --name ${{ secrets.AWS_EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
-
-      - name: Install kubectl for EKS 1.30
-        run: |
-          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          mkdir -p ~/.local/bin
-          mv ./kubectl ~/.local/bin/kubectl
-          kubectl version --client
 
       - name: Deploy to Kubernetes
         run: |

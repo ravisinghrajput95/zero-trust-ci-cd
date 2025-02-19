@@ -134,3 +134,8 @@ jobs:
         with:
           mode: analyze
           verbose: true
+      
+      - name: Analyze
+        uses: falcosecurity/falco-actions/analyze@<commit-sha>
+        with:
+          falco-version: '0.39.0'

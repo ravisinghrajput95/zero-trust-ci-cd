@@ -130,7 +130,7 @@ jobs:
           cat falco-logs.txt
 
       - name: Upload Falco Logs as Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: falco-logs
           path: falco-logs.txt

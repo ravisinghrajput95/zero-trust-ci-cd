@@ -117,16 +117,16 @@ jobs:
 
       - name: Deploy Falco for Runtime Security Monitoring
         run: |
-          helm upgrade --install falco falcosecurity/falco -n falco --create-namespace
+          helm upgrade --install falco falcosecurity/falco 
           # Wait a few seconds for Falco pods to be scheduled
           sleep 20
-          kubectl get pods -n falco
+          kubectl get pods | grep falco
 
       - name: Fetch Falco Logs
         run: |
           # Get logs from the first Falco pod in the falco namespace and save to a file
-          POD=$(kubectl get pods -n falco -l app=falco -o jsonpath='{.items[0].metadata.name}')
-          kubectl logs -n falco $POD --tail=100 > falco-logs.txt
+          POD=$(kubectl get pods -l app=falco -o jsonpath='{.items[0].metadata.name}')
+          kubectl logs $POD --tail=100 > falco-logs.txt
           cat falco-logs.txt
 
       - name: Upload Falco Logs as Artifact

@@ -122,12 +122,30 @@ jobs:
           sleep 20
           kubectl get pods -n falco
 
-      - name: Fetch Falco Logs
+      - name: Wait for Falco Pod and Fetch Logs
         run: |
-          # Get logs from the first Falco pod in the falco namespace and save to a file
-          POD=$(kubectl get pods -n falco -l app=falco -o jsonpath='{.items[0].metadata.name}')
-          kubectl logs -n falco $POD --tail=100 > falco-logs.txt
-          cat falco-logs.txt
+           # Try up to 10 times (with a 10-second pause between attempts) to get a Falco pod name
+           for i in {1..10}; do
+             POD=$(kubectl get pods -n falco -l app=falco -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+             if [ -n "$POD" ]; then
+               echo "Found Falco pod: $POD"
+               break
+             fi
+             echo "Waiting for Falco pod to be ready... attempt $i"
+             sleep 10
+           done
+
+    # If no pod was found after retries, exit with error
+           if [ -z "$POD" ]; then
+             echo "No Falco pod found, exiting."
+             exit 1
+           fi
+
+    # Fetch the last 100 lines of logs from the pod and output them
+           kubectl logs -n falco "$POD" --tail=100 > falco-logs.txt
+           echo "Falco logs:"
+           cat falco-logs.txt
+
 
       - name: Upload Falco Logs as Artifact
         uses: actions/upload-artifact@v4

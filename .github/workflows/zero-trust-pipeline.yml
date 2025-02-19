@@ -122,24 +122,17 @@ jobs:
           sleep 20
           kubectl get pods -n falco
 
-      - name: Wait for Falco Pod and Fetch Logs
+      - name: Fetch Falco Logs
         run: |
-          echo "Waiting for Falco Pod..."
-          for i in {1..10}; do
-            POD=$(kubectl get pods -n falco -l app=falco -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
-            if [ -n "$POD" ]; then
-              echo "Found Falco pod: $POD"
-              break
-            fi
-            echo "Waiting for Falco pod to be ready... attempt $i"
-            sleep 10
-          done
+          echo "Fetching Falco logs..."
+          POD=$(kubectl get pods -n falco -l app=falco -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
           if [ -z "$POD" ]; then
-            echo "No Falco pod found. Listing pods in namespace 'falco' for debugging:"
+            echo "No Falco pod found in namespace 'falco'."
             kubectl get pods -n falco
             exit 1
+          else
+            echo "Found Falco pod: $POD"
           fi
-          # Fetch the last 100 lines of logs from the pod
           kubectl logs -n falco "$POD" --tail=100 > falco-logs.txt
           echo "Falco logs:"
           cat falco-logs.txt

@@ -139,3 +139,7 @@ jobs:
         uses: falcosecurity/falco-actions/analyze@main
         with:
           falco-version: '0.39.0'
+          openai-user-prompt: "Pls add remediation steps"
+          openai-model: "gpt-3.5-turbo"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

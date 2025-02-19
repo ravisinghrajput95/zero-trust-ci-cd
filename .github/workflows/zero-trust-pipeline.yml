@@ -135,9 +135,11 @@ jobs:
             sleep 10
           done
           if [ -z "$POD" ]; then
-            echo "No Falco pod found, exiting."
+            echo "No Falco pod found. Listing pods in namespace 'falco' for debugging:"
+            kubectl get pods -n falco
             exit 1
           fi
+          # Fetch the last 100 lines of logs from the pod
           kubectl logs -n falco "$POD" --tail=100 > falco-logs.txt
           echo "Falco logs:"
           cat falco-logs.txt

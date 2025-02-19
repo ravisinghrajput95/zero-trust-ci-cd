@@ -100,10 +100,37 @@ jobs:
         run: |
           aws sts get-caller-identity
           kubectl config current-context
-          kubectl auth can-i get deployments --namespace default
 
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f k8s/deployment.yml
           kubectl apply -f k8s/service.yml
-          kubectl rollout status deployment/flask-app
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Add Falco Helm Repository
+        run: |
+          helm repo add falcosecurity https://falcosecurity.github.io/charts
+          helm repo update
+
+      - name: Deploy Falco for Runtime Security Monitoring
+        run: |
+          helm upgrade --install falco falcosecurity/falco -n falco --create-namespace
+          # Wait a few seconds for Falco pods to be scheduled
+          sleep 20
+          kubectl get pods -n falco
+
+      - name: Fetch Falco Logs
+        run: |
+          # Get logs from the first Falco pod in the falco namespace and save to a file
+          POD=$(kubectl get pods -n falco -l app=falco -o jsonpath='{.items[0].metadata.name}')
+          kubectl logs -n falco $POD --tail=100 > falco-logs.txt
+          cat falco-logs.txt
+
+      - name: Upload Falco Logs as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: falco-logs
+          path: falco-logs.txt

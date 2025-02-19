@@ -123,14 +123,14 @@ jobs:
           kubectl get pods -n falco
 
       - name: Start Falco
-        uses: falcosecurity/falco-actions/start@<commit-sha>
+        uses: falcosecurity/falco-actions/start@main
         with:
           mode: live
           falco-version: '0.39.0'
           verbose: true
 
       - name: Stop Falco
-        uses: falcosecurity/falco-actions/stop@<commit-sha>
+        uses: falcosecurity/falco-actions/stop@main
         with:
           mode: analyze
           verbose: true

@@ -106,40 +106,22 @@ jobs:
           kubectl apply -f k8s/deployment.yml
           kubectl apply -f k8s/service.yml
 
-      - name: Install Helm
-        run: |
-          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
-      - name: Add Falco Helm Repository
-        run: |
-          helm repo add falcosecurity https://falcosecurity.github.io/charts
-          helm repo update
-
-      - name: Deploy Falco for Runtime Security Monitoring
-        run: |
-          helm upgrade --install falco falcosecurity/falco -n falco --create-namespace
-          # Wait a few seconds for Falco pods to be scheduled
-          sleep 20
-          kubectl get pods -n falco
-
-      - name: Start Falco
-        uses: falcosecurity/falco-actions/start@main
-        with:
-          mode: live
-          falco-version: '0.39.0'
-          verbose: true
-
-      - name: Stop Falco
-        uses: falcosecurity/falco-actions/stop@main
-        with:
-          mode: analyze
-          verbose: true
       
-      - name: Analyze
-        uses: falcosecurity/falco-actions/analyze@main
-        with:
-          falco-version: '0.39.0'
-          openai-user-prompt: "Pls add remediation steps"
-          openai-model: "gpt-3.5-turbo"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  Analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+    - name: Start Falco
+      uses: falcosecurity/falco-actions/start@main
+      with:
+        mode: live
+        falco-version: '0.39.0'
+        verbose: true
+
+    - name: Stop Falco
+      uses: falcosecurity/falco-actions/stop@<commit-sha>
+      with:
+        mode: live
+        verbose: true

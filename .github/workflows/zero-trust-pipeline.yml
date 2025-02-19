@@ -125,14 +125,22 @@ jobs:
       - name: Fetch Falco Logs
         run: |
           echo "Fetching Falco logs..."
+          # Attempt to get Falco pod using label "app=falco"
           POD=$(kubectl get pods -n falco -l app=falco -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+          # If not found, try label "release=falco"
           if [ -z "$POD" ]; then
-            echo "No Falco pod found in namespace 'falco'."
-            kubectl get pods -n falco
+            echo "No pod found with label 'app=falco'. Trying 'release=falco'..."
+            POD=$(kubectl get pods -n falco -l release=falco -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+          fi
+          # If still not found, list all pods for debugging and exit with error
+          if [ -z "$POD" ]; then
+            echo "No Falco pod found in namespace 'falco'. Listing pods for debugging:"
+            kubectl get pods -n falco --show-labels
             exit 1
           else
             echo "Found Falco pod: $POD"
           fi
+          # Fetch the last 100 lines of logs from the identified pod
           kubectl logs -n falco "$POD" --tail=100 > falco-logs.txt
           echo "Falco logs:"
           cat falco-logs.txt
